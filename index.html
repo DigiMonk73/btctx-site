@@ -1,289 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTCTX - Free Bitcoin Portfolio Tracker & Tax Report Generator</title>
-    <meta name="description" content="Free, open-source Bitcoin portfolio tracker and IRS-compliant tax report generator. Your data stays on your machine.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>BitcoinTX: Bitcoin portfolio and tax tracker that runs on your own machine</title>
+<meta name="description" content="BitcoinTX keeps a double-entry ledger of your bitcoin, matches every sale to the coins it came from, and fills in IRS Form 8949 and Schedule D. Free and open source, for Mac, StartOS and Docker. No account, no cloud.">
+<meta property="og:title" content="BitcoinTX: Bitcoin taxes, worked out on your own machine">
+<meta property="og:description" content="Double-entry ledger, per-account FIFO lots, Form 8949 and Schedule D. Mac, StartOS and Docker. Free and open source.">
+<meta property="og:image" content="https://digimonk73.github.io/btctx-site/img/dashboard.png">
+<meta property="og:url" content="https://digimonk73.github.io/btctx-site/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="64x64" href="icon-64.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+@font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url(fonts/inter-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 500; font-display: swap; src: url(fonts/inter-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 600; font-display: swap; src: url(fonts/inter-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Outfit"; font-weight: 500; font-display: swap; src: url(fonts/outfit-latin-500-normal.woff2) format("woff2"); }
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="64x64" href="icon-64.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+/* The app's own tokens (frontend/src/styles/theme.css in BTCTX-MCP) */
+:root {
+  --bg: #0e0e10;
+  --bg-elevated: #141417;
+  --surface: #18181b;
+  --raised: #222226;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --text: #f4f4f5;
+  --text-2: #b9b9c0;
+  --muted: #8d8d96;
+  --gold: #e5b45a;
+  --gold-hover: #efc373;
+  --on-gold: #16130c;
+  --gold-tint: rgba(229, 180, 90, 0.12);
+  --gold-line: rgba(229, 180, 90, 0.45);
+  --green: #4cc97a;
+  --warn: #f2a93b;
+  --warn-tint: rgba(242, 169, 59, 0.1);
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --display: "Outfit", "Inter", -apple-system, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --wrap: 1200px;
+  color-scheme: dark;
+}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'btc-orange': '#F7931A',
-                        'btc-dark': '#0D1117',
-                        'btc-gray': '#161B22',
-                        'btc-border': '#30363D',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 1rem/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--gold); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--gold-hover); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+code, pre { font-family: var(--mono); font-size: 0.875em; }
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+.skip { position: absolute; left: -999px; }
+.skip:focus { left: 16px; top: 16px; background: var(--gold); color: var(--on-gold); padding: 8px 12px; border-radius: var(--radius-sm); z-index: 10; }
+
+h1, h2, h3 { margin: 0; font-weight: 500; }
+h1, h2 { font-family: var(--display); letter-spacing: -0.02em; }
+h1 { font-size: clamp(2.4rem, 5.2vw, 3.9rem); line-height: 1.04; }
+h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); line-height: 1.1; }
+h3 { font: 600 1.0625rem/1.35 var(--sans); }
+p { margin: 0; }
+.lede { color: var(--text-2); font-size: 1.1875rem; line-height: 1.55; max-width: 34em; }
+
+/* Buttons: the app's pill buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 22px; border-radius: 9999px;
+  font: 600 1rem/1 var(--sans); text-decoration: none; white-space: nowrap;
+  border: 1px solid transparent; cursor: pointer;
+}
+.btn-primary { background: var(--gold); color: var(--on-gold); }
+.btn-primary:hover { background: var(--gold-hover); color: var(--on-gold); }
+.btn-secondary { background: var(--raised); color: var(--text); border-color: var(--border-strong); }
+.btn-secondary:hover { background: #2c2c31; color: var(--text); }
+.btn small { font-weight: 500; opacity: 0.7; font-size: 0.8125rem; }
+.btn svg { width: 18px; height: 18px; flex: none; }
+
+/* Header */
+.top { border-bottom: 1px solid var(--border); background: var(--bg-elevated); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; font: 500 1.25rem var(--display); }
+.brand:hover { color: var(--text); }
+.brand img { width: 34px; height: 34px; }
+.top nav { display: flex; gap: 28px; font-size: 0.9375rem; }
+.top nav a { color: var(--text-2); text-decoration: none; }
+.top nav a:hover { color: var(--text); }
+
+/* Hero */
+.hero { padding: 72px 0 88px; }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; align-items: center; }
+.hero h1 { margin-bottom: 22px; }
+.hero .lede { margin-bottom: 32px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+.fineprint { color: var(--muted); font-size: 0.875rem; }
+
+/* The trace: an exchange email becomes a ledger entry becomes a Form 8949 line */
+.trace { position: relative; display: grid; gap: 18px; }
+.trace::before {
+  content: ""; position: absolute; left: 23px; top: 28px; bottom: 28px; width: 2px;
+  background: linear-gradient(var(--gold-line), var(--gold-line)) no-repeat top / 100% var(--line, 100%);
+}
+.stage { position: relative; padding-left: 60px; min-width: 0; }
+.stage::before {
+  content: ""; position: absolute; left: 16px; top: 22px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--gold);
+}
+.stage-label { color: var(--muted); font-size: 0.8125rem; margin: 0 0 8px; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.email { font-size: 0.9375rem; color: var(--text-2); }
+.email b { color: var(--text); font-weight: 500; }
+.ledger { font-family: var(--mono); font-size: 0.8125rem; line-height: 1.7; }
+.ledger .row { display: flex; justify-content: space-between; gap: 16px; }
+.ledger .k { color: var(--muted); }
+.ledger .lot { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-strong); color: var(--text-2); }
+.form { padding: 0; overflow-x: auto; border-color: var(--gold-line); }
+.form-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 18px; background: var(--gold-tint); font-size: 0.8125rem; }
+.form-head strong { color: var(--gold); font-weight: 600; }
+.form-head span { color: var(--text-2); }
+.form table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.75rem; }
+.form th, .form td { padding: 8px 7px; text-align: right; white-space: nowrap; }
+.form th:first-child, .form td:first-child { text-align: left; padding-left: 18px; }
+.form th:last-child, .form td:last-child { padding-right: 18px; }
+.form th { color: var(--muted); font-weight: 400; line-height: 1.35; vertical-align: bottom; border-bottom: 1px solid var(--border); }
+.form td.gain { color: var(--green); }
+.form-foot { padding: 10px 18px 12px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8125rem; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @property --line { syntax: "<percentage>"; inherits: true; initial-value: 100%; }
+  .trace { --line: 0%; animation: trace-line 1.5s 0.25s cubic-bezier(.5, 0, .2, 1) forwards; }
+  .stage { opacity: 0; transform: translateY(6px); animation: stage-in 0.5s forwards; }
+  .stage:nth-child(1) { animation-delay: 0.1s; }
+  .stage:nth-child(2) { animation-delay: 0.65s; }
+  .stage:nth-child(3) { animation-delay: 1.2s; }
+  @keyframes trace-line { to { --line: 100%; } }
+  @keyframes stage-in { to { opacity: 1; transform: none; } }
+}
+
+/* Sections */
+section { padding: 96px 0; border-top: 1px solid var(--border); }
+.section-head { max-width: 40em; margin-bottom: 48px; }
+.section-head h2 { margin-bottom: 14px; }
+.section-head p { color: var(--text-2); font-size: 1.0625rem; }
+
+.shot { border-radius: var(--radius-lg); border: 1px solid var(--border-strong); overflow: hidden; background: var(--surface); }
+.shot-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
+figure { margin: 0; }
+figcaption { color: var(--muted); font-size: 0.875rem; margin-top: 10px; }
+
+/* Features: grouped, two columns */
+.group { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; padding: 40px 0; border-top: 1px solid var(--border); }
+.section-head + .group { border-top: 0; padding-top: 0; }
+.group > h3 { font: 500 1.5rem/1.2 var(--display); letter-spacing: -0.01em; color: var(--gold); }
+.group > h3 span { display: block; margin-top: 8px; font: 400 0.9375rem/1.5 var(--sans); color: var(--muted); letter-spacing: 0; }
+.items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; }
+.items h3 { margin-bottom: 6px; }
+.items p { color: var(--text-2); font-size: 0.9375rem; }
+
+/* AI */
+.ai .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.ai .lede { margin: 18px 0 24px; }
+.prompts { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 10px; }
+.prompts li { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; color: var(--text); font-size: 0.9375rem; }
+.warn { background: var(--warn-tint); border: 1px solid rgba(242, 169, 59, 0.3); border-radius: var(--radius); padding: 16px 18px; color: var(--text-2); font-size: 0.9375rem; }
+.warn strong { color: var(--warn); font-weight: 600; }
+.plain { margin: 20px 0 0; padding-left: 18px; color: var(--text-2); font-size: 0.9375rem; }
+.plain li + li { margin-top: 6px; }
+
+/* Download */
+.platforms { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 24px; }
+.platform { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; display: flex; flex-direction: column; }
+.platform.mac { border-color: var(--gold-line); }
+.platform h3 { font: 500 1.375rem var(--display); margin-bottom: 6px; }
+.platform > p { color: var(--text-2); font-size: 0.9375rem; margin-bottom: 20px; }
+.platform .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.platform ol { margin: auto 0 0; padding-left: 18px; color: var(--text-2); font-size: 0.875rem; }
+.platform ol li + li { margin-top: 6px; }
+.cmd { position: relative; margin-bottom: 20px; }
+.cmd pre { margin: 0; background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 14px 16px 52px; color: var(--text); font-size: 0.8125rem; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+.copy { position: absolute; bottom: 8px; right: 8px; padding: 7px 14px; font-size: 0.8125rem; }
+.after { margin-top: 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; color: var(--text-2); font-size: 0.9375rem; }
+.after h3 { margin-bottom: 6px; color: var(--text); }
+
+footer { border-top: 1px solid var(--border); padding: 40px 0 56px; color: var(--muted); font-size: 0.875rem; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 32px; }
+footer nav { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+footer a { color: var(--text-2); text-decoration: none; }
+footer a:hover { color: var(--text); }
+
+@media (max-width: 960px) {
+  .hero .wrap, .ai .wrap { grid-template-columns: 1fr; gap: 48px; }
+  .hero { padding: 48px 0 64px; }
+  .group { grid-template-columns: 1fr; gap: 20px; }
+  .platforms, .after { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  .top nav { gap: 20px; }
+  .top nav a:not(.keep) { display: none; }
+  section { padding: 64px 0; }
+  .items, .shot-row { grid-template-columns: 1fr; }
+  .stage { padding-left: 40px; }
+  .trace::before { left: 13px; }
+  .stage::before { left: 6px; }
+  .form table { font-size: 0.72rem; }
+  .form th, .form td { padding: 7px 6px; }
+  .form .opt { display: none; }
+  .btn { padding: 12px 18px; }
+}
+</style>
 </head>
-<body class="bg-btc-dark text-gray-100">
+<body>
+<a class="skip" href="#main">Skip to content</a>
 
-    <!-- Header -->
-    <header class="border-b border-btc-border">
-        <nav class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="icon-64.png" alt="BTCTX Logo" class="w-10 h-10 rounded-full">
-                <span class="text-xl font-semibold">BTCTX</span>
-            </div>
-            <div class="flex items-center gap-6">
-                <a href="https://github.com/DigiMonk73/BTCTX" target="_blank" class="text-gray-400 hover:text-white transition">GitHub</a>
-                <a href="#donate" class="bg-btc-orange text-black px-4 py-2 rounded-lg font-medium hover:bg-orange-500 transition">Donate</a>
-            </div>
-        </nav>
-    </header>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="icon-64.png" alt="" width="34" height="34">BitcoinTX</a>
+    <nav aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#ai">AI entry</a>
+      <a class="keep" href="#download">Download</a>
+      <a class="keep" href="https://github.com/DigiMonk73/BTCTX-MCP">GitHub</a>
+    </nav>
+  </div>
+</header>
 
-    <!-- Hero Section -->
-    <section class="max-w-6xl mx-auto px-6 py-16 text-center">
-        <!-- Large Centered Logo -->
-        <img src="icon-256.png" alt="BTCTX Logo" class="w-40 h-40 mx-auto mb-8">
-
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Your Bitcoin. Your Data.<br>
-            <span class="text-btc-orange">Your Taxes. Done.</span>
-        </h1>
-        <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-            Free, open-source Bitcoin portfolio tracker and IRS-compliant tax report generator.
-            Runs locally on your machine — your financial data never leaves your computer.
-        </p>
-        <!-- Download Options -->
-        <div class="mb-6">
-            <p class="text-gray-400 mb-4">Choose your platform:</p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-                <!-- Docker -->
-                <a href="https://github.com/DigiMonk73/BTCTX/releases" target="_blank" class="bg-btc-gray border border-btc-border rounded-xl p-4 hover:border-btc-orange transition group">
-                    <div class="text-3xl mb-2">🐳</div>
-                    <div class="font-semibold group-hover:text-btc-orange">Docker</div>
-                    <div class="text-xs text-gray-500">GitHub Releases</div>
-                </a>
-                <!-- StartOS -->
-                <a href="https://github.com/DigiMonk73/BTCTX-StartOS/releases" target="_blank" class="bg-btc-gray border border-btc-border rounded-xl p-4 hover:border-btc-orange transition group">
-                    <div class="text-3xl mb-2">🏠</div>
-                    <div class="font-semibold group-hover:text-btc-orange">StartOS</div>
-                    <div class="text-xs text-gray-500">.s9pk Package</div>
-                </a>
-                <!-- Mac -->
-                <a href="https://github.com/BitcoinTX-org/BTCTX-org/releases/latest" target="_blank" class="bg-btc-gray border border-btc-border rounded-xl p-4 hover:border-btc-orange transition group">
-                    <div class="text-3xl mb-2">🍎</div>
-                    <div class="font-semibold group-hover:text-btc-orange">Mac App</div>
-                    <div class="text-xs text-gray-500">Download .dmg</div>
-                </a>
-                <!-- Windows -->
-                <div class="bg-btc-gray border border-btc-border rounded-xl p-4 opacity-50 cursor-not-allowed">
-                    <div class="text-3xl mb-2">🪟</div>
-                    <div class="font-semibold">Windows</div>
-                    <div class="text-xs text-gray-500">Coming Soon</div>
-                </div>
-            </div>
+<main id="main">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Bitcoin taxes, worked out on your own machine.</h1>
+        <p class="lede">BitcoinTX keeps a double-entry ledger of every buy, sell and move, matches each sale to the coins it came from, and fills in IRS Form 8949 and Schedule D. It runs on your Mac, your StartOS server or in Docker. No account, no cloud, free and open source.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest/download/BitcoinTX-macOS.dmg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>
+            Download for Mac <small>.dmg</small>
+          </a>
+          <a class="btn btn-secondary" href="#download">StartOS and Docker</a>
         </div>
+        <p class="fineprint">Tax forms for the United States (IRS). BitcoinTX doesn't give tax advice; check its output before you file.</p>
+      </div>
 
-        <!-- Source Code Link -->
-        <a href="https://github.com/DigiMonk73/BTCTX" target="_blank" class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition">
-            <span>View Source on GitHub</span>
-            <span>→</span>
-        </a>
-    </section>
-
-    <!-- Features Section -->
-    <section class="bg-btc-gray border-y border-btc-border">
-        <div class="max-w-6xl mx-auto px-6 py-20">
-            <h2 class="text-3xl font-bold text-center mb-12">Why BTCTX?</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <!-- Feature 1 -->
-                <div class="bg-btc-dark border border-btc-border rounded-xl p-6">
-                    <div class="text-btc-orange text-3xl mb-4">🔒</div>
-                    <h3 class="text-xl font-semibold mb-2">Privacy First</h3>
-                    <p class="text-gray-400">Runs 100% locally. No cloud. No accounts. No tracking. Your financial data stays on your machine.</p>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="bg-btc-dark border border-btc-border rounded-xl p-6">
-                    <div class="text-btc-orange text-3xl mb-4">📋</div>
-                    <h3 class="text-xl font-semibold mb-2">IRS Compliant</h3>
-                    <p class="text-gray-400">Generate Form 8949 and Schedule D reports. FIFO cost basis calculation built-in.</p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="bg-btc-dark border border-btc-border rounded-xl p-6">
-                    <div class="text-btc-orange text-3xl mb-4">🆓</div>
-                    <h3 class="text-xl font-semibold mb-2">Free Forever</h3>
-                    <p class="text-gray-400">100% free and open-source. No subscriptions, no premium tiers, no hidden fees.</p>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="bg-btc-dark border border-btc-border rounded-xl p-6">
-                    <div class="text-btc-orange text-3xl mb-4">₿</div>
-                    <h3 class="text-xl font-semibold mb-2">Bitcoin Only</h3>
-                    <p class="text-gray-400">Purpose-built for Bitcoin. No altcoin bloat. Focused and simple.</p>
-                </div>
-
-            </div>
+      <div class="trace" role="img" aria-label="Example: an exchange email for selling 0.05 BTC becomes a ledger entry matched to coins bought in January 2023, then a Form 8949 line in Box K with a $3,987.50 long-term gain">
+        <div class="stage">
+          <p class="stage-label">You paste the exchange email, or enter it yourself</p>
+          <div class="panel email">
+            <b>Order filled.</b> You sold <b>0.05 BTC</b> for <b>$4,850.00</b>. Fee: $12.00. June 20, 2025, 12:00 PM ET.
+          </div>
         </div>
-    </section>
-
-    <!-- Screenshot Section -->
-    <section class="max-w-6xl mx-auto px-6 py-20">
-        <h2 class="text-3xl font-bold text-center mb-12">See It In Action</h2>
-
-        <!-- Main Dashboard Screenshot -->
-        <div class="bg-btc-gray border border-btc-border rounded-xl p-4 max-w-5xl mx-auto mb-12">
-            <img src="BTCTX.png" alt="BTCTX Dashboard - Portfolio Overview" class="rounded-lg w-full">
+        <div class="stage">
+          <p class="stage-label">BitcoinTX records it and matches it to the coins it came from</p>
+          <div class="panel ledger">
+            <div class="row"><span>Sell, Exchange</span><span>−0.05000000 BTC</span></div>
+            <div class="row"><span class="k">Proceeds after fee</span><span>$4,838.00</span></div>
+            <div class="lot">
+              <div class="row"><span class="k">From the lot bought</span><span>Jan 10, 2023</span></div>
+              <div class="row"><span class="k">Cost basis, 0.05 BTC</span><span>$850.50</span></div>
+              <div class="row"><span class="k">Held</span><span>2 years 5 months, long-term</span></div>
+            </div>
+          </div>
         </div>
-
-        <!-- Feature Screenshots Grid -->
-        <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div class="bg-btc-gray border border-btc-border rounded-xl p-3">
-                <img src="BTCTX2.png" alt="BTCTX Transactions" class="rounded-lg w-full mb-3">
-                <p class="text-center text-sm text-gray-400">Track all your transactions</p>
-            </div>
-            <div class="bg-btc-gray border border-btc-border rounded-xl p-3">
-                <img src="BTCTX3.png" alt="BTCTX Tax Reports" class="rounded-lg w-full mb-3">
-                <p class="text-center text-sm text-gray-400">Generate IRS tax reports</p>
-            </div>
-            <div class="bg-btc-gray border border-btc-border rounded-xl p-3">
-                <img src="BTCTX4.png" alt="BTCTX Settings" class="rounded-lg w-full mb-3">
-                <p class="text-center text-sm text-gray-400">Import CSV & manage data</p>
-            </div>
+        <div class="stage">
+          <p class="stage-label">You file the filled-in form</p>
+          <div class="panel form">
+            <div class="form-head"><strong>Form 8949, Part II, Box K</strong><span>Tax year 2025</span></div>
+            <table>
+              <thead><tr><th>(a)<br>Property</th><th class="opt">(b)<br>Acquired</th><th class="opt">(c)<br>Sold</th><th>(d)<br>Proceeds</th><th>(e)<br>Basis</th><th>(h)<br>Gain</th></tr></thead>
+              <tbody><tr><td>0.05 BTC</td><td class="opt">01/10/2023</td><td class="opt">06/20/2025</td><td>4,838.00</td><td>850.50</td><td class="gain">3,987.50</td></tr></tbody>
+            </table>
+            <p class="form-foot">Carried to Schedule D, line 9.</p>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
 
-    <!-- How It Works -->
-    <section class="bg-btc-gray border-y border-btc-border">
-        <div class="max-w-6xl mx-auto px-6 py-20">
-            <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
-            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+  <section aria-labelledby="look">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="look">Your whole stack, one screen.</h2>
+        <p>Bank, exchange and cold-storage balances, what your coins cost, what you've gained, and what you earned in bitcoin.</p>
+      </div>
+      <figure class="shot"><img src="img/dashboard.png" width="2940" height="1520" alt="BitcoinTX dashboard: account balances, total BTC, cost basis, unrealized and realized gains, income and fees" loading="lazy"></figure>
+      <div class="shot-row">
+        <figure><div class="shot"><img src="img/transactions.png" width="2940" height="1520" alt="Transactions list showing sells with their gain and holding period" loading="lazy"></div><figcaption>Every transaction, with the gain and holding period of each sale.</figcaption></figure>
+        <figure><div class="shot"><img src="img/reports.png" width="2940" height="1520" alt="Reports page: complete tax report, IRS forms, transaction history" loading="lazy"></div><figcaption>Pick a tax year and export the forms.</figcaption></figure>
+      </div>
+    </div>
+  </section>
 
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-btc-orange text-black rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">1</div>
-                    <h3 class="text-xl font-semibold mb-2">Download & Install</h3>
-                    <p class="text-gray-400">Get BTCTX for your platform. Docker, Mac, or Windows. Takes 2 minutes.</p>
-                </div>
+  <section id="features" aria-labelledby="features-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="features-h">What it does</h2>
+        <p>Built for bitcoin only, and for the way bitcoiners actually move coins: buy on an exchange, withdraw to cold storage, spend or sell later.</p>
+      </div>
 
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-btc-orange text-black rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">2</div>
-                    <h3 class="text-xl font-semibold mb-2">Add Transactions</h3>
-                    <p class="text-gray-400">Enter your buys, sells, deposits, and withdrawals. Full control over your data.</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-btc-orange text-black rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">3</div>
-                    <h3 class="text-xl font-semibold mb-2">Generate Reports</h3>
-                    <p class="text-gray-400">Export IRS-compliant Form 8949 and Schedule D. Ready for tax filing.</p>
-                </div>
-
-            </div>
+      <div class="group">
+        <h3>Record<span>Enter what happened once; the ledger works out the rest.</span></h3>
+        <div class="items">
+          <div><h3>Five kinds of transaction</h3><p>Deposit, withdrawal, transfer, buy and sell, across your bank, exchange cash, exchange bitcoin and your own wallet. Every one is a balanced double entry.</p></div>
+          <div><h3>FIFO lots per account</h3><p>Each sale uses the oldest coins in that account. Moving coins to cold storage keeps their purchase date and cost, so the holding clock and the basis travel with them.</p></div>
+          <div><h3>Network fees handled</h3><p>The on-chain fee of a transfer or withdrawal is recorded as its own small disposal, valued at that day's price.</p></div>
+          <div><h3>Backdate freely</h3><p>Every add, edit or delete recalculates the whole ledger in date order, so a forgotten purchase from two years ago lands in the right place.</p></div>
+          <div><h3>Imports</h3><p>River's CSV export, a generic CSV to start a new ledger, or an AI assistant that turns emails and wallet histories into entries.</p></div>
+          <div><h3>Income at its real value</h3><p>Bitcoin earned as pay, interest or rewards is valued at that day's price, which is both its cost basis and the income you report.</p></div>
         </div>
-    </section>
+      </div>
 
-    <!-- Donate Section -->
-    <section id="donate" class="max-w-6xl mx-auto px-6 py-20 text-center">
-        <h2 class="text-3xl font-bold mb-4">Support the Project</h2>
-        <p class="text-xl text-gray-400 max-w-xl mx-auto mb-8">
-            BTCTX is free and always will be. If it saves you time or money, consider supporting development with a donation.
-        </p>
-        <p class="text-gray-500 mb-8 italic">"Value for value — pay what it's worth to you."</p>
-
-        <!-- BTCPay Button Placeholder -->
-        <div class="inline-block bg-btc-gray border border-btc-border rounded-xl p-8">
-            <!--
-                ==========================================
-                BTCPAY SERVER BUTTON - REPLACE THIS BLOCK
-                ==========================================
-
-                To add your BTCPay button:
-                1. Go to your BTCPay Server on StartOS
-                2. Create a store called "BTCTX Donations"
-                3. Go to Plugins > Pay Button
-                4. Configure the button style
-                5. Copy the generated HTML and replace this placeholder
-
-            -->
-            <div class="text-gray-400">
-                <p class="text-btc-orange text-4xl mb-4">₿</p>
-                <p class="font-semibold mb-2">Bitcoin Donations Coming Soon</p>
-                <p class="text-sm">BTCPay Server integration pending</p>
-            </div>
-            <!-- END BTCPAY PLACEHOLDER -->
+      <div class="group">
+        <h3>File<span>Forms your preparer, or you, can use as they are.</span></h3>
+        <div class="items">
+          <div><h3>Form 8949 and Schedule D</h3><p>The official IRS PDFs, filled in and flattened, one sheet per box, with totals carried to the right Schedule D lines.</p></div>
+          <div><h3>1099-DA boxes</h3><p>From tax year 2025, exchange sales go in the boxes for Form 1099-DA. If your broker's form says something different for a sale, record that on the sale and the box follows.</p></div>
+          <div><h3>Complete tax report</h3><p>Gains, income, fees and year-end balances in one PDF, plus your transaction history as a spreadsheet.</p></div>
+          <div><h3>Your tax timezone</h3><p>Decides which year a late-night December 31 sale belongs to, the dates on the forms, and the day a holding turns long-term: after one full year, as the IRS counts it.</p></div>
         </div>
-    </section>
+      </div>
 
-    <!-- Comparison Section -->
-    <section class="bg-btc-gray border-y border-btc-border">
-        <div class="max-w-6xl mx-auto px-6 py-20">
-            <h2 class="text-3xl font-bold text-center mb-12">Stop Paying for Cloud Tax Software</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full max-w-3xl mx-auto text-left">
-                    <thead>
-                        <tr class="border-b border-btc-border">
-                            <th class="py-4 px-4">Service</th>
-                            <th class="py-4 px-4">Model</th>
-                            <th class="py-4 px-4">Price</th>
-                            <th class="py-4 px-4">Privacy</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-gray-400">
-                        <tr class="border-b border-btc-border">
-                            <td class="py-4 px-4">Koinly</td>
-                            <td class="py-4 px-4">SaaS</td>
-                            <td class="py-4 px-4">$49-279/yr</td>
-                            <td class="py-4 px-4 text-red-400">Cloud</td>
-                        </tr>
-                        <tr class="border-b border-btc-border">
-                            <td class="py-4 px-4">CoinTracker</td>
-                            <td class="py-4 px-4">SaaS</td>
-                            <td class="py-4 px-4">$59-199/yr</td>
-                            <td class="py-4 px-4 text-red-400">Cloud</td>
-                        </tr>
-                        <tr class="border-b border-btc-border">
-                            <td class="py-4 px-4">Bitcoin.tax</td>
-                            <td class="py-4 px-4">SaaS</td>
-                            <td class="py-4 px-4">$39-199/yr</td>
-                            <td class="py-4 px-4 text-red-400">Cloud</td>
-                        </tr>
-                        <tr class="bg-btc-dark">
-                            <td class="py-4 px-4 font-semibold text-white">BTCTX</td>
-                            <td class="py-4 px-4 text-btc-orange">Free/OSS</td>
-                            <td class="py-4 px-4 text-btc-orange">$0</td>
-                            <td class="py-4 px-4 text-green-400">Local</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+      <div class="group">
+        <h3>Check<span>See what's off before it reaches a form.</span></h3>
+        <div class="items">
+          <div><h3>Ledger review</h3><p>A read-only list of entries worth a second look: a spend saved at $0, a deposit with no cost basis, a fee valued far from the day's price, and every figure a recalculation would change.</p></div>
+          <div><h3>Stored price history</h3><p>Past daily prices are kept on your machine. Nothing is ever valued at today's price or at $0 by accident: with no price, BitcoinTX asks.</p></div>
+          <div><h3>Encrypted backups</h3><p>Download the whole database as a password-protected backup and restore it on any install. Upgrades keep a copy of the old database first.</p></div>
         </div>
-    </section>
+      </div>
 
-    <!-- Footer -->
-    <footer class="border-t border-btc-border">
-        <div class="max-w-6xl mx-auto px-6 py-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <img src="icon-64.png" alt="BTCTX Logo" class="w-8 h-8 rounded-full">
-                    <span class="font-semibold">BTCTX</span>
-                    <span class="text-gray-500">— Free Bitcoin Tax Software</span>
-                </div>
-                <div class="flex items-center gap-6 text-gray-400">
-                    <a href="https://github.com/DigiMonk73/BTCTX" target="_blank" class="hover:text-white transition">GitHub</a>
-                    <a href="https://github.com/DigiMonk73/BTCTX/blob/main/LICENSE" target="_blank" class="hover:text-white transition">MIT License</a>
-                    <span>Made with ₿ love</span>
-                </div>
-            </div>
+      <div class="group">
+        <h3>Keep private<span>Your financial history is nobody else's business.</span></h3>
+        <div class="items">
+          <div><h3>Runs where you are</h3><p>On your Mac, your StartOS server or your own Docker host, behind your own login. There's no BitcoinTX account and no server of ours.</p></div>
+          <div><h3>Privacy &amp; Network settings</h3><p>Turn live price data off, use your own mempool server, or send every outside request through Tor or another proxy.</p></div>
+          <div><h3>Lookups that don't give you away</h3><p>Missing prices are downloaded in bulk, about a thousand days at a time, so no request names the date of one of your transactions.</p></div>
+          <div><h3>Nothing phones home</h3><p>No analytics, no trackers, fonts shipped with the app. The database and backups are readable by you alone.</p></div>
         </div>
-    </footer>
+      </div>
+    </div>
+  </section>
 
+  <section id="ai" class="ai" aria-labelledby="ai-h">
+    <div class="wrap">
+      <div>
+        <h2 id="ai-h">Or just describe it to an AI.</h2>
+        <p class="lede">BitcoinTX includes an MCP server, so an AI app on your computer can read your ledger and enter transactions for you. It shows a preview with duplicates flagged and the resulting gains, and saves only after you confirm.</p>
+        <ul class="prompts" aria-label="Example requests">
+          <li>Here's my River email: "You bought 0.00231 BTC for $150.00 (fee $1.49) on Mar 3"</li>
+          <li>I withdrew everything from the exchange to my Coldcard on March 10, network fee 1,800 sats</li>
+          <li>Got paid 250k sats for a logo design on May 2, straight to cold storage</li>
+        </ul>
+        <p class="warn"><strong>Pick the model with care.</strong> The AI's model reads what BitcoinTX hands it and whatever you paste. With a cloud AI such as Claude or Grok, that goes to the provider. To keep it on your computer, use an app that runs a local model, such as LM Studio or Goose with Ollama.</p>
+        <ul class="plain">
+          <li>Works with Claude Desktop, Claude Code, Grok Build, LM Studio, Goose and other MCP apps.</li>
+          <li>Settings has a setup prompt: paste it into your AI app and it sets itself up.</li>
+          <li>In the Mac app, AI access is off until you turn it on, and uses a key, never your password.</li>
+        </ul>
+      </div>
+      <figure><div class="shot"><img src="img/settings.png" width="1732" height="1550" alt="Settings: Connect an AI Assistant, with the privacy note, the AI access switch and the setup prompt" loading="lazy"></div><figcaption>Settings, Connect an AI Assistant, in the Mac app.</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="download" aria-labelledby="download-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="download-h">Download</h2>
+        <p>Every link below fetches the latest release. What changed: <a href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest">release notes</a>.</p>
+      </div>
+      <div class="platforms">
+        <div class="platform mac">
+          <h3>Mac</h3>
+          <p>A normal Mac app. Your data stays in your user folder.</p>
+          <div class="btns">
+            <a class="btn btn-primary" href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest/download/BitcoinTX-macOS.dmg">Download .dmg</a>
+            <a class="btn btn-secondary" href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest/download/BitcoinTX-macOS.zip">.zip</a>
+          </div>
+          <ol>
+            <li>Open the .dmg and drag BitcoinTX to Applications.</li>
+            <li>The app isn't signed by Apple yet. The first time, Control-click it and choose Open. On macOS 15 or later, open it once, then go to System Settings, Privacy &amp; Security, and click Open Anyway.</li>
+          </ol>
+        </div>
+        <div class="platform">
+          <h3>StartOS</h3>
+          <p>For a Start9 server: runs next to your node, reachable from your devices.</p>
+          <div class="btns">
+            <a class="btn btn-primary" href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest/download/btctx.s9pk">Download .s9pk</a>
+          </div>
+          <ol>
+            <li>In StartOS, open Sideload and upload btctx.s9pk.</li>
+            <li>Run Show Credentials, start the service and open its Web UI.</li>
+            <li>Package source: <a href="https://github.com/DigiMonk73/BTCTX-StartOS">BTCTX-StartOS</a>.</li>
+          </ol>
+        </div>
+        <div class="platform">
+          <h3>Docker</h3>
+          <p>Linux, Windows or Mac; amd64 and arm64.</p>
+          <div class="cmd">
+            <pre id="docker-cmd">docker run -d -p 8080:80 -v btctx-data:/data ghcr.io/digimonk73/btctx-mcp:latest</pre>
+            <button type="button" class="btn btn-secondary copy" data-copy="docker-cmd">Copy</button>
+          </div>
+          <ol>
+            <li>Open http://localhost:8080.</li>
+            <li>Your data lives in the btctx-data volume. Pin a version with :vX.Y.Z.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="after">
+        <div><h3>First run</h3><p>A new install starts with the login admin / password. The first screen has you set your own before anything else.</p></div>
+        <div><h3>Upgrading</h3><p>Install the new version over the old one. It upgrades your database by itself and keeps a copy of the old one.</p></div>
+        <div><h3>From source</h3><p>Python 3.10+ and Node 20+. Instructions in the <a href="https://github.com/DigiMonk73/BTCTX-MCP#from-source">README</a>.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>BitcoinTX is free and open source under the <a href="https://github.com/DigiMonk73/BTCTX-MCP/blob/main/LICENSE">MIT license</a>. It doesn't give tax advice.</p>
+    <nav aria-label="Footer">
+      <a href="https://github.com/DigiMonk73/BTCTX-MCP">Source</a>
+      <a href="https://github.com/DigiMonk73/BTCTX-MCP/releases">Releases</a>
+      <a href="https://github.com/DigiMonk73/BTCTX-MCP/blob/main/docs/CHANGELOG.md">Changelog</a>
+      <a href="https://github.com/DigiMonk73/BTCTX-MCP/issues">Report a problem</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll("[data-copy]").forEach(function (button) {
+  button.addEventListener("click", function () {
+    var text = document.getElementById(button.dataset.copy).textContent;
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(text).then(function () {
+      button.textContent = "Copied";
+      setTimeout(function () { button.textContent = "Copy"; }, 1600);
+    }, function () {});
+  });
+});
+</script>
 </body>
 </html>
