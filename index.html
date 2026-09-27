@@ -345,7 +345,7 @@ footer a:hover { color: var(--text); }
         <div class="items">
           <div><h3>Runs where you are</h3><p>On your Mac, your StartOS server or your own Docker host, behind your own login. There's no BitcoinTX account and no server of ours.</p></div>
           <div><h3>Privacy &amp; Network settings</h3><p>Turn live price data off, use your own mempool server, or send every outside request through Tor or another proxy.</p></div>
-          <div><h3>Lookups that don't give you away</h3><p>Missing prices are downloaded in bulk, about a thousand days at a time, so no request names the date of one of your transactions.</p></div>
+          <div><h3>Prices looked up in bulk</h3><p>Past prices are stored with your ledger. A missing day comes in one download of about a thousand days, so lookups rarely point at one of your dates; if that download fails, BitcoinTX asks for the single day. Turn live data off to send nothing.</p></div>
           <div><h3>Nothing phones home</h3><p>No analytics, no trackers, fonts shipped with the app. The database and backups are readable by you alone.</p></div>
         </div>
       </div>
@@ -366,10 +366,11 @@ footer a:hover { color: var(--text); }
         <ul class="plain">
           <li>Works with Claude Desktop, Claude Code, Grok Build, LM Studio, Goose and other MCP apps.</li>
           <li>Settings has a setup prompt: paste it into your AI app and it sets itself up.</li>
-          <li>In the Mac app, AI access is off until you turn it on, and uses a key, never your password.</li>
+          <li>AI access is off until you turn it on, and the AI uses a key you can revoke, never your password. The key can read and enter transactions; it can't log in, restore a backup or delete everything.</li>
+          <li>The connector updates itself when your AI app restarts.</li>
         </ul>
       </div>
-      <figure><div class="shot"><img src="img/settings.png" width="1732" height="1550" alt="Settings: Connect an AI Assistant, with the privacy note, the AI access switch and the setup prompt" loading="lazy"></div><figcaption>Settings, Connect an AI Assistant, in the Mac app.</figcaption></figure>
+      <figure><div class="shot"><img src="img/settings.png" width="1676" height="1502" alt="Settings: Connect an AI Assistant, with the privacy note, the AI access switch and the setup prompt" loading="lazy"></div><figcaption>Settings, Connect an AI Assistant, in the Mac app.</figcaption></figure>
     </div>
   </section>
 
