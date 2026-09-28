@@ -344,7 +344,7 @@ footer a:hover { color: var(--text); }
         <h3>Keep private<span>Your financial history is nobody else's business.</span></h3>
         <div class="items">
           <div><h3>Runs where you are</h3><p>On your Mac, your StartOS server or your own Docker host, behind your own login. There's no BitcoinTX account and no server of ours.</p></div>
-          <div><h3>Your own node for prices</h3><p>Take the live price, block height and past prices from your own mempool server, from public sites, or from nowhere. Nothing is contacted until you choose.</p></div>
+          <div><h3>Your own node for prices</h3><p>Take the live price, block height and past prices from your own mempool server, from public sites, or from nowhere. Nothing is contacted until you choose. On StartOS, one action connects the Mempool on the same server, and public sites can go over Tor.</p></div>
           <div><h3>Lookups that don't give away your dates</h3><p>Past prices are stored with your ledger. From public sites, the whole daily history comes in one download that's the same for every install, so no request names one of your dates. A VPN or a Tor proxy hides your IP address too.</p></div>
           <div><h3>Nothing phones home</h3><p>No analytics, no trackers, fonts shipped with the app. The database and backups are readable by you alone.</p></div>
         </div>
@@ -367,7 +367,7 @@ footer a:hover { color: var(--text); }
           <li>Works with Claude Desktop, Claude Code, Grok Build, LM Studio, Goose and other MCP apps.</li>
           <li>Settings has a setup prompt: paste it into your AI app and it sets itself up.</li>
           <li>AI access is off until you turn it on, and the AI uses a key you can revoke, never your password. The key can read and enter transactions; it can't log in, restore a backup or delete everything.</li>
-          <li>The connector updates itself when your AI app restarts.</li>
+          <li>The connector (btctx-mcp on PyPI) is pinned to your BitcoinTX version, so nothing new is fetched behind your back.</li>
         </ul>
       </div>
       <figure><div class="shot"><img src="img/settings.png" width="1676" height="1502" alt="Settings: Connect an AI Assistant, with the privacy note, the AI access switch and the setup prompt" loading="lazy"></div><figcaption>Settings, Connect an AI Assistant, in the Mac app.</figcaption></figure>
@@ -401,7 +401,8 @@ footer a:hover { color: var(--text); }
           </div>
           <ol>
             <li>In StartOS, open Sideload and upload btctx.s9pk.</li>
-            <li>Run Show Credentials, start the service and open its Web UI.</li>
+            <li>Run Show Credentials, then Price Source &amp; Privacy: your own Mempool, public sites (optionally over Tor), or nothing.</li>
+            <li>Start the service and open its Web UI.</li>
             <li>Package source: <a href="https://github.com/DigiMonk73/BTCTX-StartOS">BTCTX-StartOS</a>.</li>
           </ol>
         </div>
