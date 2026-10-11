@@ -412,11 +412,11 @@ footer a:hover { color: var(--text); }
           <h3>Docker</h3>
           <p>Linux, Windows or Mac; amd64 and arm64.</p>
           <div class="cmd">
-            <pre id="docker-cmd">docker run -d -p 8080:80 -v btctx-data:/data ghcr.io/digimonk73/btctx-mcp:latest</pre>
+            <pre id="docker-cmd">docker run -d -p 127.0.0.1:8080:80 -v btctx-data:/data ghcr.io/digimonk73/btctx-mcp:latest</pre>
             <button type="button" class="btn btn-secondary copy" data-copy="docker-cmd">Copy</button>
           </div>
           <ol>
-            <li>Open http://localhost:8080.</li>
+            <li>Open http://localhost:8080. It's reachable from this computer only: for other devices, put it behind HTTPS (a reverse proxy such as Caddy).</li>
             <li>Your data lives in the btctx-data volume. Pin a version with :vX.Y.Z.</li>
           </ol>
         </div>
