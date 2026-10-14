@@ -316,11 +316,11 @@ footer a:hover { color: var(--text); }
         <h3>Record<span>Enter what happened once; the ledger works out the rest.</span></h3>
         <div class="items">
           <div><h3>Five kinds of transaction</h3><p>Deposit, withdrawal, transfer, buy and sell, across your bank, exchange cash, exchange bitcoin and your own wallet. Every one is a balanced double entry.</p></div>
-          <div><h3>FIFO lots per account</h3><p>Each sale uses the oldest coins in that account. Moving coins to cold storage keeps their purchase date and cost, so the holding clock and the basis travel with them. Coins you already owned, or received as a gift, can keep the date they were first acquired.</p></div>
-          <div><h3>Network fees handled</h3><p>The on-chain fee of a transfer or withdrawal is recorded as its own small disposal, valued at that day's price.</p></div>
+          <div><h3>FIFO lots per account</h3><p>Each sale uses the oldest coins in that account. Moving coins to cold storage keeps their purchase date and cost, so the holding clock and the basis travel with them. Coins you already owned, or received as a gift, can keep the date they were first acquired. Inherited bitcoin takes its value on the date of death and is always long-term.</p></div>
+          <div><h3>Network fees handled</h3><p>The on-chain fee of a transfer or withdrawal is recorded as its own small disposal, valued at the price when its hour began. A spend's fee also comes off what the spend brought, and a consolidation within your wallet records just its fee.</p></div>
           <div><h3>Backdate freely</h3><p>Every add, edit or delete recalculates the whole ledger in date order, so a forgotten purchase from two years ago lands in the right place.</p></div>
           <div><h3>Imports</h3><p>River's CSV export, a generic CSV to start a new ledger, or an AI assistant that turns emails and wallet histories into entries.</p></div>
-          <div><h3>Income at its real value</h3><p>Bitcoin earned as pay, interest, mining, staking or bonuses is valued at that day's price, which is both its cost basis and the income you report. Sats-back for spending is valued the same way, as a rebate, not income.</p></div>
+          <div><h3>Income at its real value</h3><p>Bitcoin earned as pay, interest, mining, staking or bonuses is valued at the price when its hour began, which is both its cost basis and the income you report. Sats-back for spending is valued the same way, as a rebate, not income.</p></div>
         </div>
       </div>
 
@@ -337,8 +337,8 @@ footer a:hover { color: var(--text); }
       <div class="group">
         <h3>Check<span>See what's off before it reaches a form.</span></h3>
         <div class="items">
-          <div><h3>Ledger review</h3><p>A read-only list of entries worth a second look: a spend saved at $0, a deposit with no cost basis, an income or rebate deposit with no value, a fee valued far from the day's price, and every figure a recalculation would change; then, as a reminder, My BTC and Gift deposits without their original date.</p></div>
-          <div><h3>Stored price history</h3><p>Past daily prices are kept on your machine. Nothing is ever valued at today's price or at $0 by accident: with no price, BitcoinTX asks.</p></div>
+          <div><h3>Ledger review</h3><p>A read-only list of entries worth a second look: a spend saved at $0, a deposit with no cost basis, an income or rebate deposit with no value, values priced at the day's price that the hour would change, and every figure a recalculation would change; then, as a reminder, My BTC and Gift deposits without their original date.</p></div>
+          <div><h3>Hourly price history</h3><p>Hourly prices from 2013 are kept on your machine, from one download checked against fingerprints that come with BitcoinTX, when you allow public price sites. Nothing is ever valued at today's price or at $0 by accident: with no price, BitcoinTX asks you to type it.</p></div>
           <div><h3>Encrypted backups</h3><p>Download the whole database as a password-protected backup and restore it on any install. Upgrades keep a copy of the old database first.</p></div>
         </div>
       </div>
@@ -347,8 +347,8 @@ footer a:hover { color: var(--text); }
         <h3>Keep private<span>Your financial history is nobody else's business.</span></h3>
         <div class="items">
           <div><h3>Runs where you are</h3><p>On your Mac, your StartOS server or your own Docker host, behind your own login. There's no BitcoinTX account and no server of ours.</p></div>
-          <div><h3>Your own node for prices</h3><p>Take the live price, block height and past prices from your own mempool server, from public sites, or from nowhere. Nothing is contacted until you choose. On StartOS, one action connects the Mempool on the same server, and public sites can go over Tor.</p></div>
-          <div><h3>Lookups that don't give away your dates</h3><p>Past prices are stored with your ledger. From public sites, the whole daily history comes in one download that's the same for every install, so no request names one of your dates. A VPN or a Tor proxy hides your IP address too.</p></div>
+          <div><h3>Your own node for prices</h3><p>Ask your own Mempool for newer prices, or public price sites, or nobody. Nothing is contacted until you choose. On StartOS, one action connects the Mempool on the same server, and public sites can go over Tor.</p></div>
+          <div><h3>Lookups that don't give away your dates</h3><p>The hourly history comes in one download that's the same for every install, then only the newest hours in fixed blocks, so no request names one of your dates. One price per hour won't always match a chart of one exchange at another moment. A VPN or Tor hides your IP address too; through Tor, Bitstamp currently refuses the download, so choose public price sites without Tor for it, or type older values.</p></div>
           <div><h3>Nothing phones home</h3><p>No analytics, no trackers, fonts shipped with the app. The database and backups are readable by you alone.</p></div>
         </div>
       </div>
@@ -405,7 +405,7 @@ footer a:hover { color: var(--text); }
           <ol>
             <li>Start9 publishes each release to its Community Beta registry. In StartOS, open Marketplace, click Switch and add <code>https://community-beta-registry.start9.com</code> (<a href="https://docs.start9.com/start-os/alternative-registries.html">Start9's guide</a>), then choose BitcoinTX and click Install. New versions show in the Updates tab.</li>
             <li>Or sideload it: download btctx.s9pk above and upload it under Sideload.</li>
-            <li>Run Set Login Credentials (it shows your login once: keep it), then Price Source &amp; Privacy: your own Mempool, public sites (optionally over Tor), or nothing.</li>
+            <li>Run Set Login Credentials (it shows your login once: keep it), then Price Source &amp; Privacy: your own Mempool, public price sites (optionally through Tor), Nobody, or decide in BitcoinTX.</li>
             <li>Start the service and open its Web UI.</li>
             <li>Package source: <a href="https://github.com/Start9-Community/BTCTX-StartOS">Start9-Community/BTCTX-StartOS</a>.</li>
           </ol>
