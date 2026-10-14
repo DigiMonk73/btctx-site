@@ -198,6 +198,7 @@ figcaption { color: var(--muted); font-size: 0.875rem; margin-top: 10px; }
 .ln { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 20px; }
 .ln a { font-weight: 600; font-size: 1.125rem; color: var(--gold); text-decoration: none; word-break: break-all; }
 .ln a:hover { text-decoration: underline; }
+.ln-qr { display: block; margin-top: 20px; width: 160px; height: 160px; border-radius: 8px; }
 .cmd pre { margin: 0; background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 14px 16px 52px; color: var(--text); font-size: 0.8125rem; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
 .copy { position: absolute; bottom: 8px; right: 8px; padding: 7px 14px; font-size: 0.8125rem; }
 .after { margin-top: 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; color: var(--text-2); font-size: 0.9375rem; }
@@ -445,6 +446,7 @@ footer a:hover { color: var(--text); }
         <a href="lightning:digimonk73@strike.me" aria-label="Send sats over Lightning to digimonk73@strike.me">&#9889; <span id="ln-address">digimonk73@strike.me</span></a>
         <button type="button" class="btn btn-secondary" data-copy="ln-address">Copy</button>
       </div>
+      <img class="ln-qr" src="img/lightning-qr.svg" width="160" height="160" alt="QR code for the Lightning address digimonk73@strike.me: scan it with a Lightning wallet">
     </div>
   </section>
 </main>
