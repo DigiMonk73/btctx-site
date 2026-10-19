@@ -316,7 +316,7 @@ footer a:hover { color: var(--text); }
       <div class="section-head">
         <h2 id="features-h">What it does</h2>
         <p>Built for bitcoin only, and for the way bitcoiners actually move coins: buy on an exchange, withdraw to cold storage, spend or sell later.</p>
-        <p class="warn"><strong>⚠ Important: one wallet, one exchange.</strong> BitcoinTX tracks one self-custody wallet and one exchange account. Since 2025, IRS rules require cost basis to be figured wallet by wallet and account by account, so if you use several wallets or exchange accounts, BitcoinTX's gains can differ from what the rules give: keep separate records for each, or ask your tax preparer.</p>
+        <p class="warn"><strong>⚠ Important: one wallet, one exchange.</strong> BitcoinTX tracks one self-custody wallet and one exchange account. Since 2025, IRS rules require cost basis to be figured wallet by wallet and account by account, so if you use multiple wallets or exchange accounts, BitcoinTX's gains can differ from what the rules give: keep separate records for each, or ask your tax preparer. Multiple wallets and exchanges, each with its own lots, are planned for BitcoinTX 2.0.</p>
       </div>
 
       <div class="group">
@@ -336,7 +336,7 @@ footer a:hover { color: var(--text); }
         <div class="items">
           <div><h3>Form 8949 and Schedule D</h3><p>The official IRS PDFs, filled in and flattened, one sheet per box, with totals carried to the right Schedule D lines. Until the IRS publishes next year's final forms, a preview on its drafts, marked DRAFT — DO NOT FILE.</p></div>
           <div><h3>1099-DA boxes</h3><p>From tax year 2025, exchange sales go in the boxes for Form 1099-DA. If your broker's form says something different for a sale, record that on the sale and the box follows.</p></div>
-          <div><h3>Complete tax report</h3><p>One PDF for you or your preparer: the year's key figures on the cover, a one-page summary with each Form 8949 box and its Schedule D line, then every sale, income and holding, with rebates in a table of their own. A “Using these forms” page tells your preparer what's filled in on the forms, what's left blank, and why. Your transaction history comes as a spreadsheet or a PDF.</p></div>
+          <div><h3>Complete tax report</h3><p>One PDF for you or your preparer: the year's key figures on the cover, a one-page summary with each Form 8949 box, its Schedule D line and the answer to Form 1040's digital asset question, then every sale, income, gift and holding, with rebates in a table of their own. A “Using these forms” page tells your preparer what's filled in on the forms, what's left blank, and why. Your transaction history comes as a spreadsheet or a PDF.</p></div>
           <div><h3>Your tax timezone</h3><p>Decides which year a late-night December 31 sale belongs to, the dates on the forms, and the day a holding turns long-term: after one full year, as the IRS counts it.</p></div>
         </div>
       </div>
@@ -344,9 +344,9 @@ footer a:hover { color: var(--text); }
       <div class="group">
         <h3>Check<span>See what's off before it reaches a form.</span></h3>
         <div class="items">
-          <div><h3>Ledger review</h3><p>A read-only list of entries worth a second look: a spend saved at $0, a deposit with no cost basis, an income or rebate deposit with no value, values priced at the day's price that the hour would change, and every figure a recalculation would change; then, as a reminder, My BTC and Gift deposits without their original date.</p></div>
+          <div><h3>Ledger review</h3><p>A read-only list of entries worth a second look: a spend saved at $0, a buy or deposit with no cost basis, an income, rebate, gift or donation with no value, values priced at the day's price that the hour would change, and every figure a recalculation would change; then, as a reminder, My BTC and Gift deposits without their original date.</p></div>
           <div><h3>Hourly price history</h3><p>Hourly prices from 2013 are kept on your machine, from one download checked against fingerprints that come with BitcoinTX, when you allow public price sites. Nothing is ever valued at today's price or at $0 by accident: with no price, BitcoinTX asks you to type it.</p></div>
-          <div><h3>Encrypted backups</h3><p>Download the whole database as a password-protected backup and restore it on any install. Upgrades keep a copy of the old database first.</p></div>
+          <div><h3>Encrypted backups</h3><p>Download the whole database as a password-protected backup and restore it on any install. Upgrades and Delete All keep a copy of the database first.</p></div>
         </div>
       </div>
 
@@ -355,7 +355,7 @@ footer a:hover { color: var(--text); }
         <div class="items">
           <div><h3>Runs where you are</h3><p>On your Mac, your StartOS server or your own Docker host, behind your own login. There's no BitcoinTX account and no server of ours.</p></div>
           <div><h3>Your own node for prices</h3><p>Ask your own Mempool for newer prices, or public price sites, or nobody. Nothing is contacted until you choose. On StartOS, one action connects the Mempool on the same server, and public sites can go over Tor.</p></div>
-          <div><h3>Lookups that don't give away your dates</h3><p>The hourly history comes in one download that's the same for every install, then only the newest hours in fixed blocks, so no request names one of your dates. One price per hour won't always match a chart of one exchange at another moment. A VPN or Tor hides your IP address too; through Tor, Bitstamp currently refuses the download, so choose public price sites without Tor for it, or type older values.</p></div>
+          <div><h3>Lookups that don't give away your dates</h3><p>The hourly history comes in one download that's the same for every install, then only the newest hours in fixed blocks, so no request names one of your dates. One price per hour won't always match a chart of one exchange at another moment. A VPN or Tor hides your IP address too. Through Tor, Bitstamp refuses the history download, so BitcoinTX asks once before fetching just that download without Tor: Bitstamp then sees your address, still none of your dates, and the live price stays on Tor.</p></div>
           <div><h3>Nothing phones home</h3><p>No analytics, no trackers, fonts shipped with the app. The database and backups are readable by you alone.</p></div>
         </div>
       </div>
@@ -389,11 +389,12 @@ footer a:hover { color: var(--text); }
       <div class="section-head">
         <h2 id="download-h">Download</h2>
         <p>Every download below is the latest release. What changed: <a href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest">release notes</a>.</p>
+        <p>BitcoinTX 1.x is the stable version: it gets maintenance updates (bug and security fixes, each year's IRS forms, the price history). Big new features go into BitcoinTX 2.0, now in the works, with multiple wallets, exchanges and bank accounts. No dates promised.</p>
       </div>
       <div class="platforms">
         <div class="platform mac">
           <h3>Mac</h3>
-          <p>A normal Mac app. Your data stays in your user folder.</p>
+          <p>A normal Mac app, for Macs with Apple silicon (M1 or later). Your data stays in your user folder.</p>
           <div class="btns">
             <a class="btn btn-primary" href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest/download/BitcoinTX-macOS.dmg">Download .dmg</a>
             <a class="btn btn-secondary" href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest/download/BitcoinTX-macOS.zip">.zip</a>
@@ -427,13 +428,14 @@ footer a:hover { color: var(--text); }
           <ol>
             <li>Open http://localhost:8080. It's reachable from this computer only: for other devices, put it behind HTTPS (a reverse proxy such as Caddy).</li>
             <li>Your data lives in the btctx-data volume. Pin a version with :vX.Y.Z.</li>
+            <li>BitcoinTX runs in the container as its own user, never as root.</li>
           </ol>
         </div>
       </div>
       <div class="after">
         <div><h3>First run</h3><p>A new Mac or Docker install starts with the login admin / password, and the first screen has you set your own before anything else. The Mac app needs no code; Docker also asks for a one-time setup code, shown by docker logs and saved as setup-code.txt in /data. On StartOS, Set Login Credentials creates your login and shows it once.</p></div>
-        <div><h3>Upgrading</h3><p>Install the new version over the old one. It upgrades your database by itself and keeps a copy of the old one. Then open Settings, Ledger Review. If you use the AI connector, change btctx-mcp== to the new version in your AI app's settings and restart the AI app.</p></div>
-        <div><h3>From source</h3><p>Python 3.10+ and Node 20+. Instructions in the <a href="https://github.com/DigiMonk73/BTCTX-MCP#from-source">README</a>.</p></div>
+        <div><h3>Upgrading</h3><p>Install the new version over the old one. It upgrades your database by itself and keeps a copy of the old one. Then open Settings, Ledger Review: it lists every figure a recalculation would change, and you run Recalculate Ledger when you agree. If you use the AI connector, change btctx-mcp== to the new version in your AI app's settings and restart the AI app.</p></div>
+        <div><h3>From source</h3><p>Python 3.10+ and Node.js 22.13+. Instructions in the <a href="https://github.com/DigiMonk73/BTCTX-MCP#from-source">README</a>.</p></div>
       </div>
     </div>
   </section>
