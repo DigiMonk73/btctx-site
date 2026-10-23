@@ -411,7 +411,7 @@ footer a:hover { color: var(--text); }
             <a class="btn btn-secondary" href="https://github.com/DigiMonk73/BTCTX-MCP/releases/latest/download/btctx.s9pk">Download .s9pk</a>
           </div>
           <ol>
-            <li>Start9 publishes each release to its Community Beta registry. In StartOS, open Marketplace, click Switch and add <code>https://community-beta-registry.start9.com</code> (<a href="https://docs.start9.com/start-os/alternative-registries.html">Start9's guide</a>), then choose BitcoinTX and click Install. New versions show in the Updates tab.</li>
+            <li>Start9 publishes each release first to its Community Beta registry, then, once tested there, to its Community Registry. In StartOS, open Marketplace, click Switch and choose Community Registry (<code>https://community-registry.start9.com</code>); to get each release as soon as it's out, add <code>https://community-beta-registry.start9.com</code> instead (<a href="https://docs.start9.com/start-os/alternative-registries.html">Start9's guide</a>). Then choose BitcoinTX and click Install. New versions show in the Updates tab.</li>
             <li>Or sideload it: download btctx.s9pk above and upload it under Sideload.</li>
             <li>Run Set Login Credentials (it shows your login once: keep it), then Price Source &amp; Privacy: your own Mempool, public price sites (optionally through Tor), Nobody, or decide in BitcoinTX.</li>
             <li>Start the service and open its Web UI.</li>
@@ -435,7 +435,7 @@ footer a:hover { color: var(--text); }
       <div class="after">
         <div><h3>First run</h3><p>A new Mac or Docker install starts with the login admin / password, and the first screen has you set your own before anything else. The Mac app needs no code; Docker also asks for a one-time setup code, shown by docker logs and saved as setup-code.txt in /data. On StartOS, Set Login Credentials creates your login and shows it once.</p></div>
         <div><h3>Upgrading</h3><p>Install the new version over the old one. It upgrades your database by itself and keeps a copy of the old one. Then open Settings, Ledger Review: it lists every figure a recalculation would change, and you run Recalculate Ledger when you agree. If you use the AI connector, change btctx-mcp== to the new version in your AI app's settings and restart the AI app.</p></div>
-        <div><h3>From source</h3><p>Python 3.10+ and Node.js 22.13+. Instructions in the <a href="https://github.com/DigiMonk73/BTCTX-MCP#from-source">README</a>.</p></div>
+        <div><h3>From source</h3><p>Python 3.11+ and Node.js 22.13+. Instructions in the <a href="https://github.com/DigiMonk73/BTCTX-MCP#from-source">README</a>.</p></div>
       </div>
     </div>
   </section>
